@@ -303,6 +303,68 @@ def health():
     })
 
 
+@app.route("/guestlist", methods=["POST"])
+def guestlist_pass():
+    """Generate pass AND email it in one request — faster than two round trips."""
+    import smtplib, threading
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.base import MIMEBase
+    from email import encoders
+
+    ticket = request.get_json()
+    if not ticket:
+        return jsonify({"error": "Missing ticket data"}), 400
+
+    to_email = ticket.get("userEmail", "")
+    name = ticket.get("userName", "Guest")
+    event_name = ticket.get("eventName", "Mansion Nightclub")
+
+    if not to_email:
+        return jsonify({"error": "Missing userEmail"}), 400
+
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASS", "")
+    if not smtp_user or not smtp_pass:
+        return jsonify({"error": "Email not configured"}), 500
+
+    try:
+        pkpass_bytes = build_pkpass(ticket)
+    except Exception as e:
+        return jsonify({"error": f"Pass generation failed: {e}"}), 500
+
+    def send_email():
+        msg = MIMEMultipart()
+        msg["From"] = f"Mansion Nightclub <{smtp_user}>"
+        msg["To"] = to_email
+        msg["Subject"] = f"You're on the guestlist — {event_name}"
+        html = f"""
+        <div style="background:#000;color:#fff;font-family:sans-serif;padding:40px;max-width:500px;margin:0 auto;">
+          <h1 style="color:#d4af37;letter-spacing:4px;font-size:24px;">MANSION</h1>
+          <h2 style="color:#fff;margin-top:0;">You're on the guestlist</h2>
+          <p style="color:#aaa;">Hi {name}, your pass for <strong style="color:#fff;">{event_name}</strong> is attached.</p>
+          <p style="color:#aaa;">Open the .pkpass file on your iPhone to add it to Apple Wallet.</p>
+          <p style="color:#555;font-size:12px;">Show your QR code at the door. ID required. 18+.</p>
+        </div>
+        """
+        msg.attach(MIMEText(html, "html"))
+        part = MIMEBase("application", "vnd.apple.pkpass")
+        part.set_payload(pkpass_bytes)
+        encoders.encode_base64(part)
+        part.add_header("Content-Disposition", "attachment", filename="mansion-guestlist.pkpass")
+        msg.attach(part)
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(smtp_user, to_email, msg.as_string())
+        except Exception as ex:
+            print(f"❌ Email failed: {ex}")
+
+    threading.Thread(target=send_email, daemon=True).start()
+    return jsonify({"status": "queued", "to": to_email})
+
+
 @app.route("/notification-icon.png")
 def notification_icon():
     img_bytes = _load_image("icon@3x.png")

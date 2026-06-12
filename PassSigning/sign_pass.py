@@ -361,12 +361,10 @@ def guestlist_pass():
         except Exception as ex:
             print(f"❌ Email failed: {ex}")
 
-    # Send synchronously so we can return the real error
-    import smtplib as _smtplib
-    msg = MIMEMultipart()
-    msg["From"] = f"Mansion Nightclub <{smtp_user}>"
-    msg["To"] = to_email
-    msg["Subject"] = f"You're on the guestlist — {event_name}"
+    resend_key = os.environ.get("RESEND_API_KEY", "")
+    if not resend_key:
+        return jsonify({"error": "RESEND_API_KEY not set"}), 500
+
     html = f"""
     <div style="background:#000;color:#fff;font-family:sans-serif;padding:40px;max-width:500px;margin:0 auto;">
       <h1 style="color:#d4af37;letter-spacing:4px;font-size:24px;">MANSION</h1>
@@ -376,18 +374,34 @@ def guestlist_pass():
       <p style="color:#555;font-size:12px;">Show your QR code at the door. ID required. 18+.</p>
     </div>
     """
-    msg.attach(MIMEText(html, "html"))
-    part = MIMEBase("application", "vnd.apple.pkpass")
-    part.set_payload(pkpass_bytes)
-    encoders.encode_base64(part)
-    part.add_header("Content-Disposition", "attachment", filename="mansion-guestlist.pkpass")
-    msg.attach(part)
+
+    import urllib.request as _urllib
+    import json as _json
+
+    attachment_b64 = base64.b64encode(pkpass_bytes).decode("utf-8")
+    payload_out = _json.dumps({
+        "from": "Mansion Nightclub <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": f"You're on the guestlist — {event_name}",
+        "html": html,
+        "attachments": [{
+            "filename": "mansion-guestlist.pkpass",
+            "content": attachment_b64
+        }]
+    }).encode("utf-8")
+
+    req_out = _urllib.Request(
+        "https://api.resend.com/emails",
+        data=payload_out,
+        headers={
+            "Authorization": f"Bearer {resend_key}",
+            "Content-Type": "application/json"
+        }
+    )
     try:
-        with _smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as server:
-            server.starttls()
-            server.login(smtp_user, smtp_pass)
-            server.sendmail(smtp_user, to_email, msg.as_string())
-        return jsonify({"status": "sent", "to": to_email})
+        with _urllib.urlopen(req_out, timeout=20) as resp:
+            result = _json.loads(resp.read())
+            return jsonify({"status": "sent", "to": to_email, "id": result.get("id")})
     except Exception as ex:
         return jsonify({"error": str(ex)}), 500
 

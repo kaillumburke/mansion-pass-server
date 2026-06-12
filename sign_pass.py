@@ -135,17 +135,34 @@ def sign_manifest(manifest_data: bytes) -> bytes:
             f.write(_get_p12_bytes())
 
         # Extract cert and key from p12
-        subprocess.run([
+        r1 = subprocess.run([
             "openssl", "pkcs12", "-in", p12_path,
             "-clcerts", "-nokeys", "-out", cert_path,
             "-passin", f"pass:{P12_PASSWORD}", "-legacy"
-        ], check=True, capture_output=True)
+        ], capture_output=True)
+        if r1.returncode != 0:
+            # try without -legacy (older openssl)
+            r1 = subprocess.run([
+                "openssl", "pkcs12", "-in", p12_path,
+                "-clcerts", "-nokeys", "-out", cert_path,
+                "-passin", f"pass:{P12_PASSWORD}"
+            ], capture_output=True)
+        if r1.returncode != 0:
+            raise RuntimeError(f"cert extract failed: {r1.stderr.decode()}")
 
-        subprocess.run([
+        r2 = subprocess.run([
             "openssl", "pkcs12", "-in", p12_path,
             "-nocerts", "-nodes", "-out", key_path,
             "-passin", f"pass:{P12_PASSWORD}", "-legacy"
-        ], check=True, capture_output=True)
+        ], capture_output=True)
+        if r2.returncode != 0:
+            r2 = subprocess.run([
+                "openssl", "pkcs12", "-in", p12_path,
+                "-nocerts", "-nodes", "-out", key_path,
+                "-passin", f"pass:{P12_PASSWORD}"
+            ], capture_output=True)
+        if r2.returncode != 0:
+            raise RuntimeError(f"key extract failed: {r2.stderr.decode()}")
 
         with open(manifest_path, "wb") as f:
             f.write(manifest_data)

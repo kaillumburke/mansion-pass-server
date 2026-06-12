@@ -38,14 +38,21 @@ TEAM_ID = "4V275QTAVK"
 
 def build_pass_json(ticket: dict) -> dict:
     from datetime import datetime
-    # Format event date nicely if available
-    created = ticket.get("createdAt", "")
-    date_str = ""
-    try:
-        dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
-        date_str = dt.strftime("%-d %b").upper()
-    except Exception:
-        date_str = ""
+
+    def parse_date(val):
+        if not val:
+            return None
+        try:
+            if isinstance(val, dict) and "_seconds" in val:
+                return datetime.utcfromtimestamp(val["_seconds"])
+            return datetime.fromisoformat(str(val).replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    event_dt = parse_date(ticket.get("eventDate")) or parse_date(ticket.get("createdAt"))
+    date_str = event_dt.strftime("%-d %b").upper() if event_dt else "SAT"
+    time_str = event_dt.strftime("%-I:%M %p") if event_dt else "10:00 PM"
+    name = (ticket.get("userName") or "").strip().upper() or "GUEST"
 
     return {
         "formatVersion": 1,
@@ -57,32 +64,37 @@ def build_pass_json(ticket: dict) -> dict:
         "foregroundColor": "rgb(255, 255, 255)",
         "backgroundColor": "rgb(0, 0, 0)",
         "labelColor": "rgb(212, 175, 55)",
-        "logoText": "",
+        "logoText": "MANSION",
         "eventTicket": {
             "headerFields": [
                 {
                     "key": "date",
                     "label": "DATE",
                     "value": date_str
+                },
+                {
+                    "key": "time",
+                    "label": "DOORS",
+                    "value": time_str
                 }
             ],
             "primaryFields": [
                 {
                     "key": "event",
                     "label": "EVENT",
-                    "value": ticket.get("eventName", "MANSION NIGHTCLUB")
+                    "value": ticket.get("eventName", "MANSION NIGHTCLUB").upper()
                 }
             ],
             "secondaryFields": [
                 {
                     "key": "tier",
-                    "label": "TICKET TYPE",
+                    "label": "TICKET",
                     "value": ticket.get("tierName", "General Admission").upper()
                 },
                 {
                     "key": "holder",
                     "label": "NAME",
-                    "value": ticket.get("userName", "Guest").upper(),
+                    "value": name,
                     "textAlignment": "PKTextAlignmentRight"
                 }
             ],
@@ -90,7 +102,7 @@ def build_pass_json(ticket: dict) -> dict:
                 {
                     "key": "venue",
                     "label": "VENUE",
-                    "value": "MANSION NIGHTCLUB"
+                    "value": "MANSION NIGHTCLUB, LIVERPOOL"
                 },
                 {
                     "key": "status",
@@ -116,9 +128,9 @@ def build_pass_json(ticket: dict) -> dict:
                     "value": "£{:.2f}".format(ticket.get("tierPriceInPence", 0) / 100)
                 },
                 {
-                    "key": "qr",
-                    "label": "QR CODE",
-                    "value": ticket.get("qrCode", "")
+                    "key": "terms",
+                    "label": "TERMS",
+                    "value": "This ticket is non-transferable. Valid ID required. Mansion Nightclub reserves the right to refuse entry."
                 }
             ]
         },
@@ -245,9 +257,7 @@ def build_pkpass(ticket: dict) -> bytes:
         "background.png":     _load_image("background.png"),
         "background@2x.png":  _load_image("background@2x.png"),
         "background@3x.png":  _load_image("background@3x.png"),
-        "thumbnail.png":      _load_image("thumbnail.png"),
-        "thumbnail@2x.png":   _load_image("thumbnail@2x.png"),
-        "thumbnail@3x.png":   _load_image("thumbnail@3x.png"),
+
     }
 
     manifest = create_manifest(files)

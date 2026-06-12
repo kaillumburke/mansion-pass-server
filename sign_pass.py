@@ -112,7 +112,8 @@ def build_pass_json(ticket: dict) -> dict:
                 "altText": ticket.get("qrCode", "")
             }
         ]
-    }
+    },
+    "stripColor": "rgb(0, 0, 0)"
 
 
 def create_manifest(files: dict) -> dict:
@@ -202,21 +203,31 @@ def make_placeholder_png(width=300, height=100, color=(0, 0, 0)) -> bytes:
     return png
 
 
+def _load_image(name: str) -> bytes:
+    path = os.path.join(BASE_DIR, "images", name)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return f.read()
+    # fallback to placeholder
+    size = 29 if "icon" in name else (50 if "logo" in name and "@2x" not in name and "@3x" not in name else 100)
+    return make_placeholder_png(size, size)
+
+
 def build_pkpass(ticket: dict) -> bytes:
     pass_json = build_pass_json(ticket)
     pass_bytes = json.dumps(pass_json, indent=2).encode("utf-8")
 
-    icon = make_placeholder_png(29, 29)
-    icon2x = make_placeholder_png(58, 58)
-    logo = make_placeholder_png(160, 50)
-    logo2x = make_placeholder_png(320, 100)
-
     files = {
-        "pass.json": pass_bytes,
-        "icon.png": icon,
-        "icon@2x.png": icon2x,
-        "logo.png": logo,
-        "logo@2x.png": logo2x,
+        "pass.json":     pass_bytes,
+        "icon.png":      _load_image("icon.png"),
+        "icon@2x.png":   _load_image("icon@2x.png"),
+        "icon@3x.png":   _load_image("icon@3x.png"),
+        "logo.png":      _load_image("logo.png"),
+        "logo@2x.png":   _load_image("logo@2x.png"),
+        "logo@3x.png":   _load_image("logo@3x.png"),
+        "strip.png":     _load_image("strip.png"),
+        "strip@2x.png":  _load_image("strip@2x.png"),
+        "strip@3x.png":  _load_image("strip@3x.png"),
     }
 
     manifest = create_manifest(files)

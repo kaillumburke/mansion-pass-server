@@ -138,13 +138,13 @@ def sign_manifest(manifest_data: bytes) -> bytes:
         subprocess.run([
             "openssl", "pkcs12", "-in", p12_path,
             "-clcerts", "-nokeys", "-out", cert_path,
-            "-passin", f"pass:{P12_PASSWORD}"
+            "-passin", f"pass:{P12_PASSWORD}", "-legacy"
         ], check=True, capture_output=True)
 
         subprocess.run([
             "openssl", "pkcs12", "-in", p12_path,
             "-nocerts", "-nodes", "-out", key_path,
-            "-passin", f"pass:{P12_PASSWORD}"
+            "-passin", f"pass:{P12_PASSWORD}", "-legacy"
         ], check=True, capture_output=True)
 
         with open(manifest_path, "wb") as f:

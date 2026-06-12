@@ -361,8 +361,35 @@ def guestlist_pass():
         except Exception as ex:
             print(f"❌ Email failed: {ex}")
 
-    threading.Thread(target=send_email, daemon=True).start()
-    return jsonify({"status": "queued", "to": to_email})
+    # Send synchronously so we can return the real error
+    import smtplib as _smtplib
+    msg = MIMEMultipart()
+    msg["From"] = f"Mansion Nightclub <{smtp_user}>"
+    msg["To"] = to_email
+    msg["Subject"] = f"You're on the guestlist — {event_name}"
+    html = f"""
+    <div style="background:#000;color:#fff;font-family:sans-serif;padding:40px;max-width:500px;margin:0 auto;">
+      <h1 style="color:#d4af37;letter-spacing:4px;font-size:24px;">MANSION</h1>
+      <h2 style="color:#fff;margin-top:0;">You're on the guestlist</h2>
+      <p style="color:#aaa;">Hi {name}, your pass for <strong style="color:#fff;">{event_name}</strong> is attached.</p>
+      <p style="color:#aaa;">Open the .pkpass file on your iPhone to add it to Apple Wallet.</p>
+      <p style="color:#555;font-size:12px;">Show your QR code at the door. ID required. 18+.</p>
+    </div>
+    """
+    msg.attach(MIMEText(html, "html"))
+    part = MIMEBase("application", "vnd.apple.pkpass")
+    part.set_payload(pkpass_bytes)
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", "attachment", filename="mansion-guestlist.pkpass")
+    msg.attach(part)
+    try:
+        with _smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, to_email, msg.as_string())
+        return jsonify({"status": "sent", "to": to_email})
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
 
 
 @app.route("/notification-icon.png")

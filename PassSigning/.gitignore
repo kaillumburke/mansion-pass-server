@@ -1,0 +1,6 @@
+MansionPass.p12
+MansionPass.key
+MansionPass.pem
+__pycache__/
+*.pyc
+.env

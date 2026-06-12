@@ -37,6 +37,16 @@ TEAM_ID = "4V275QTAVK"
 
 
 def build_pass_json(ticket: dict) -> dict:
+    from datetime import datetime
+    # Format event date nicely if available
+    created = ticket.get("createdAt", "")
+    date_str = ""
+    try:
+        dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+        date_str = dt.strftime("%-d %b").upper()
+    except Exception:
+        date_str = ""
+
     return {
         "formatVersion": 1,
         "passTypeIdentifier": PASS_TYPE_ID,
@@ -44,40 +54,49 @@ def build_pass_json(ticket: dict) -> dict:
         "teamIdentifier": TEAM_ID,
         "organizationName": "Mansion Nightclub",
         "description": ticket.get("eventName", "Mansion Nightclub"),
-        "foregroundColor": "rgb(212, 175, 55)",
+        "foregroundColor": "rgb(255, 255, 255)",
         "backgroundColor": "rgb(0, 0, 0)",
-        "labelColor": "rgb(180, 150, 30)",
-        "logoText": "MANSION",
+        "labelColor": "rgb(212, 175, 55)",
+        "logoText": "",
         "eventTicket": {
+            "headerFields": [
+                {
+                    "key": "date",
+                    "label": "DATE",
+                    "value": date_str
+                }
+            ],
             "primaryFields": [
                 {
                     "key": "event",
                     "label": "EVENT",
-                    "value": ticket.get("eventName", "Mansion Nightclub")
+                    "value": ticket.get("eventName", "MANSION NIGHTCLUB")
                 }
             ],
             "secondaryFields": [
                 {
                     "key": "tier",
-                    "label": "TICKET",
-                    "value": ticket.get("tierName", "General Admission")
+                    "label": "TICKET TYPE",
+                    "value": ticket.get("tierName", "General Admission").upper()
                 },
                 {
                     "key": "holder",
                     "label": "NAME",
-                    "value": ticket.get("userName", "Guest")
+                    "value": ticket.get("userName", "Guest").upper(),
+                    "textAlignment": "PKTextAlignmentRight"
                 }
             ],
             "auxiliaryFields": [
                 {
-                    "key": "price",
-                    "label": "PRICE",
-                    "value": "£{:.2f}".format(ticket.get("tierPriceInPence", 0) / 100)
+                    "key": "venue",
+                    "label": "VENUE",
+                    "value": "MANSION NIGHTCLUB"
                 },
                 {
                     "key": "status",
                     "label": "STATUS",
-                    "value": ticket.get("status", "valid").upper()
+                    "value": ticket.get("status", "valid").upper(),
+                    "textAlignment": "PKTextAlignmentRight"
                 }
             ],
             "backFields": [
@@ -92,17 +111,16 @@ def build_pass_json(ticket: dict) -> dict:
                     "value": ticket.get("orderId", "")[:8].upper()
                 },
                 {
+                    "key": "price",
+                    "label": "PRICE PAID",
+                    "value": "£{:.2f}".format(ticket.get("tierPriceInPence", 0) / 100)
+                },
+                {
                     "key": "qr",
                     "label": "QR CODE",
                     "value": ticket.get("qrCode", "")
                 }
             ]
-        },
-        "barcode": {
-            "message": ticket.get("qrCode", ""),
-            "format": "PKBarcodeFormatQR",
-            "messageEncoding": "iso-8859-1",
-            "altText": ticket.get("qrCode", "")
         },
         "barcodes": [
             {
@@ -112,8 +130,7 @@ def build_pass_json(ticket: dict) -> dict:
                 "altText": ticket.get("qrCode", "")
             }
         ]
-    },
-    "stripColor": "rgb(0, 0, 0)"
+    }
 
 
 def create_manifest(files: dict) -> dict:
@@ -218,16 +235,19 @@ def build_pkpass(ticket: dict) -> bytes:
     pass_bytes = json.dumps(pass_json, indent=2).encode("utf-8")
 
     files = {
-        "pass.json":     pass_bytes,
-        "icon.png":      _load_image("icon.png"),
-        "icon@2x.png":   _load_image("icon@2x.png"),
-        "icon@3x.png":   _load_image("icon@3x.png"),
-        "logo.png":      _load_image("logo.png"),
-        "logo@2x.png":   _load_image("logo@2x.png"),
-        "logo@3x.png":   _load_image("logo@3x.png"),
-        "strip.png":     _load_image("strip.png"),
-        "strip@2x.png":  _load_image("strip@2x.png"),
-        "strip@3x.png":  _load_image("strip@3x.png"),
+        "pass.json":          pass_bytes,
+        "icon.png":           _load_image("icon.png"),
+        "icon@2x.png":        _load_image("icon@2x.png"),
+        "icon@3x.png":        _load_image("icon@3x.png"),
+        "logo.png":           _load_image("logo.png"),
+        "logo@2x.png":        _load_image("logo@2x.png"),
+        "logo@3x.png":        _load_image("logo@3x.png"),
+        "background.png":     _load_image("background.png"),
+        "background@2x.png":  _load_image("background@2x.png"),
+        "background@3x.png":  _load_image("background@3x.png"),
+        "thumbnail.png":      _load_image("thumbnail.png"),
+        "thumbnail@2x.png":   _load_image("thumbnail@2x.png"),
+        "thumbnail@3x.png":   _load_image("thumbnail@3x.png"),
     }
 
     manifest = create_manifest(files)

@@ -299,3 +299,62 @@ def health():
 if __name__ == "__main__":
     print("🎫 Mansion Pass Signing Service running on http://localhost:5050")
     app.run(host="0.0.0.0", port=5050, debug=False)
+
+
+# MARK: - Email endpoint (sends pkpass as attachment)
+
+@app.route("/email", methods=["POST"])
+def email_pass():
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.base import MIMEBase
+    from email import encoders
+
+    to_email = request.form.get("to")
+    name = request.form.get("name", "Guest")
+    event_name = request.form.get("eventName", "Mansion Nightclub")
+    qr_code = request.form.get("qrCode", "")
+    pass_file = request.files.get("pass")
+
+    if not all([to_email, pass_file]):
+        return jsonify({"error": "Missing fields"}), 400
+
+    smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASS", "")
+
+    if not smtp_user or not smtp_pass:
+        return jsonify({"error": "Email not configured — set SMTP_USER and SMTP_PASS env vars"}), 500
+
+    msg = MIMEMultipart()
+    msg["From"] = f"Mansion Nightclub <{smtp_user}>"
+    msg["To"] = to_email
+    msg["Subject"] = f"You're on the guestlist — {event_name}"
+
+    html = f"""
+    <div style="background:#000;color:#fff;font-family:sans-serif;padding:40px;max-width:500px;margin:0 auto;">
+      <h1 style="color:#d4af37;letter-spacing:4px;font-size:24px;">MANSION</h1>
+      <h2 style="color:#fff;margin-top:0;">You're on the guestlist</h2>
+      <p style="color:#aaa;">Hi {name}, your General Admission pass for <strong style="color:#fff;">{event_name}</strong> is attached.</p>
+      <p style="color:#aaa;">Add it to Apple Wallet by opening the attached .pkpass file on your iPhone.</p>
+      <p style="color:#555;font-size:12px;">Show your QR code at the door. ID required. 18+.</p>
+    </div>
+    """
+    msg.attach(MIMEText(html, "html"))
+
+    part = MIMEBase("application", "vnd.apple.pkpass")
+    part.set_payload(pass_file.read())
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", "attachment", filename="mansion-guestlist.pkpass")
+    msg.attach(part)
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, to_email, msg.as_string())
+        return jsonify({"status": "sent"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -15,6 +15,9 @@ import tempfile
 import zipfile
 from flask import Flask, request, jsonify, send_file
 import io
+import stripe
+
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
 
 app = Flask(__name__)
 
@@ -380,7 +383,7 @@ def guestlist_pass():
 
     attachment_b64 = base64.b64encode(pkpass_bytes).decode("utf-8")
     payload_out = _json.dumps({
-        "from": "Mansion Nightclub <onboarding@resend.dev>",
+        "from": "Mansion Nightclub <hello@sharecollective.co.uk>",
         "to": [to_email],
         "subject": f"You're on the guestlist — {event_name}",
         "html": html,
@@ -410,6 +413,140 @@ def guestlist_pass():
 def notification_icon():
     img_bytes = _load_image("icon@3x.png")
     return send_file(io.BytesIO(img_bytes), mimetype="image/png")
+
+
+@app.route("/create-payment-intent", methods=["POST"])
+def create_payment_intent():
+    """Create a Stripe PaymentIntent for ticket purchase."""
+    if not stripe.api_key:
+        return jsonify({"error": "Stripe not configured"}), 500
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing request body"}), 400
+
+    amount = data.get("amountInPence")
+    event_id = data.get("eventId", "")
+    event_name = data.get("eventName", "Mansion Nightclub")
+    tier_name = data.get("tierName", "General Admission")
+    user_email = data.get("userEmail", "")
+    quantity = data.get("quantity", 1)
+
+    if not amount or amount <= 0:
+        return jsonify({"error": "Invalid amount"}), 400
+
+    try:
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency="gbp",
+            automatic_payment_methods={"enabled": True},
+            metadata={
+                "eventId": event_id,
+                "eventName": event_name,
+                "tierName": tier_name,
+                "userEmail": user_email,
+                "quantity": str(quantity),
+            },
+            receipt_email=user_email if user_email else None,
+        )
+        return jsonify({
+            "clientSecret": intent.client_secret,
+            "paymentIntentId": intent.id,
+        })
+    except stripe.error.StripeError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    """Handle Stripe webhook — on payment_intent.succeeded generate and email the ticket."""
+    import urllib.request as _urllib
+    import json as _json
+
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature", "")
+
+    if webhook_secret:
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+        except stripe.error.SignatureVerificationError:
+            return jsonify({"error": "Invalid signature"}), 400
+    else:
+        event = request.get_json()
+
+    if event["type"] == "payment_intent.succeeded":
+        intent = event["data"]["object"]
+        meta = intent.get("metadata", {})
+        user_email = meta.get("userEmail", "")
+        event_name = meta.get("eventName", "Mansion Nightclub")
+        tier_name = meta.get("tierName", "General Admission")
+        event_id = meta.get("eventId", "")
+        quantity = int(meta.get("quantity", 1))
+        amount = intent.get("amount", 0)
+
+        import uuid, datetime
+        resend_key = os.environ.get("RESEND_API_KEY", "")
+
+        for i in range(quantity):
+            ticket_id = str(uuid.uuid4())
+            qr_code = f"MNS-{ticket_id[:8].upper()}"
+            ticket = {
+                "id": ticket_id,
+                "orderId": intent["id"],
+                "userId": "",
+                "userEmail": user_email,
+                "userName": user_email.split("@")[0].title(),
+                "eventId": event_id,
+                "eventName": event_name,
+                "tierId": tier_name.lower().replace(" ", "-"),
+                "tierName": tier_name,
+                "tierPriceInPence": amount // quantity,
+                "qrCode": qr_code,
+                "status": "valid",
+                "createdAt": datetime.datetime.utcnow().isoformat(),
+            }
+
+            try:
+                pkpass_bytes = build_pkpass(ticket)
+            except Exception as e:
+                print(f"❌ Pass generation failed: {e}")
+                continue
+
+            if resend_key and user_email:
+                html = f"""
+                <div style="background:#000;color:#fff;font-family:sans-serif;padding:40px;max-width:500px;margin:0 auto;">
+                  <h1 style="color:#d4af37;letter-spacing:4px;font-size:24px;">MANSION</h1>
+                  <h2 style="color:#fff;margin-top:0;">Your ticket is confirmed</h2>
+                  <p style="color:#aaa;">Thanks for your purchase! Your <strong style="color:#fff;">{tier_name}</strong> ticket for <strong style="color:#fff;">{event_name}</strong> is attached.</p>
+                  <p style="color:#aaa;">Open the .pkpass file on your iPhone to add it to Apple Wallet.</p>
+                  <p style="color:#d4af37;font-size:13px;">QR Code: {qr_code}</p>
+                  <p style="color:#555;font-size:12px;">Show your QR code at the door. Valid ID required. 18+.</p>
+                </div>
+                """
+                attachment_b64 = base64.b64encode(pkpass_bytes).decode("utf-8")
+                payload_out = _json.dumps({
+                    "from": "Mansion Nightclub <hello@sharecollective.co.uk>",
+                    "to": [user_email],
+                    "subject": f"Your ticket for {event_name} 🎫",
+                    "html": html,
+                    "attachments": [{
+                        "filename": f"mansion-ticket-{qr_code}.pkpass",
+                        "content": attachment_b64
+                    }]
+                }).encode("utf-8")
+                try:
+                    req_out = _urllib.Request(
+                        "https://api.resend.com/emails",
+                        data=payload_out,
+                        headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"}
+                    )
+                    _urllib.urlopen(req_out, timeout=20)
+                    print(f"✅ Ticket emailed to {user_email}")
+                except Exception as ex:
+                    print(f"❌ Email failed: {ex}")
+
+    return jsonify({"status": "ok"})
 
 
 if __name__ == "__main__":

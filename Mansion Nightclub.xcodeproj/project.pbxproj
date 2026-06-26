@@ -6,33 +6,120 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		208906312FDCB6E50011FB56 /* MansionNotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2089062A2FDCB6E50011FB56 /* MansionNotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2089063C2FDEE5220011FB56 /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 2089063B2FDEE5220011FB56 /* StripePaymentSheet */; };
+		CD6681952FDC41480081A5B0 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = CD6681942FDC41480081A5B0 /* OneSignalFramework */; };
+		CD6681972FDC41480081A5B0 /* OneSignalInAppMessages in Frameworks */ = {isa = PBXBuildFile; productRef = CD6681962FDC41480081A5B0 /* OneSignalInAppMessages */; };
+		CD6681992FDC41480081A5B0 /* OneSignalLocation in Frameworks */ = {isa = PBXBuildFile; productRef = CD6681982FDC41480081A5B0 /* OneSignalLocation */; };
+		CD8A2CAA2FDC64C100FFC0DD /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CD8A2CA92FDC64C100FFC0DD /* FirebaseAuth */; };
+		CD8A2CAC2FDC64C100FFC0DD /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = CD8A2CAB2FDC64C100FFC0DD /* FirebaseCore */; };
+		CD8A2CAE2FDC64C100FFC0DD /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CD8A2CAD2FDC64C100FFC0DD /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2089062F2FDCB6E50011FB56 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD3F34F92FDC19D6003154F5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 208906292FDCB6E50011FB56;
+			remoteInfo = MansionNotificationService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		208906362FDCB6E50011FB56 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				208906312FDCB6E50011FB56 /* MansionNotificationService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		2089062A2FDCB6E50011FB56 /* MansionNotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MansionNotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD3F35012FDC19D6003154F5 /* Mansion Nightclub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mansion Nightclub.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		208906352FDCB6E50011FB56 /* Exceptions for "MansionNotificationService" folder in "MansionNotificationService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 208906292FDCB6E50011FB56 /* MansionNotificationService */;
+		};
+		CD3F35102FDC19D6003154F5 /* Exceptions for "Mansion Nightclub" folder in "Mansion Nightclub" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CD3F35002FDC19D6003154F5 /* Mansion Nightclub */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		2089062B2FDCB6E50011FB56 /* MansionNotificationService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				208906352FDCB6E50011FB56 /* Exceptions for "MansionNotificationService" folder in "MansionNotificationService" target */,
+			);
+			path = MansionNotificationService;
+			sourceTree = "<group>";
+		};
 		CD3F35032FDC19D6003154F5 /* Mansion Nightclub */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CD3F35102FDC19D6003154F5 /* Exceptions for "Mansion Nightclub" folder in "Mansion Nightclub" target */,
+			);
 			path = "Mansion Nightclub";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		CD3F34FE2FDC19D6003154F5 /* Frameworks */ = {
+		208906272FDCB6E50011FB56 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CD3F34FE2FDC19D6003154F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD6681972FDC41480081A5B0 /* OneSignalInAppMessages in Frameworks */,
+				CD8A2CAC2FDC64C100FFC0DD /* FirebaseCore in Frameworks */,
+				CD6681992FDC41480081A5B0 /* OneSignalLocation in Frameworks */,
+				CD6681952FDC41480081A5B0 /* OneSignalFramework in Frameworks */,
+				2089063C2FDEE5220011FB56 /* StripePaymentSheet in Frameworks */,
+				CD8A2CAA2FDC64C100FFC0DD /* FirebaseAuth in Frameworks */,
+				CD8A2CAE2FDC64C100FFC0DD /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		208906372FDCB7AB0011FB56 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		CD3F34F82FDC19D6003154F5 = {
 			isa = PBXGroup;
 			children = (
 				CD3F35032FDC19D6003154F5 /* Mansion Nightclub */,
+				2089062B2FDCB6E50011FB56 /* MansionNotificationService */,
+				208906372FDCB7AB0011FB56 /* Frameworks */,
 				CD3F35022FDC19D6003154F5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				CD3F35012FDC19D6003154F5 /* Mansion Nightclub.app */,
+				2089062A2FDCB6E50011FB56 /* MansionNotificationService.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +136,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		208906292FDCB6E50011FB56 /* MansionNotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 208906322FDCB6E50011FB56 /* Build configuration list for PBXNativeTarget "MansionNotificationService" */;
+			buildPhases = (
+				208906262FDCB6E50011FB56 /* Sources */,
+				208906272FDCB6E50011FB56 /* Frameworks */,
+				208906282FDCB6E50011FB56 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2089062B2FDCB6E50011FB56 /* MansionNotificationService */,
+			);
+			name = MansionNotificationService;
+			packageProductDependencies = (
+			);
+			productName = MansionNotificationService;
+			productReference = 2089062A2FDCB6E50011FB56 /* MansionNotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		CD3F35002FDC19D6003154F5 /* Mansion Nightclub */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CD3F350C2FDC19D6003154F5 /* Build configuration list for PBXNativeTarget "Mansion Nightclub" */;
@@ -55,16 +165,25 @@
 				CD3F34FD2FDC19D6003154F5 /* Sources */,
 				CD3F34FE2FDC19D6003154F5 /* Frameworks */,
 				CD3F34FF2FDC19D6003154F5 /* Resources */,
+				208906362FDCB6E50011FB56 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				208906302FDCB6E50011FB56 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CD3F35032FDC19D6003154F5 /* Mansion Nightclub */,
 			);
 			name = "Mansion Nightclub";
 			packageProductDependencies = (
+				CD6681942FDC41480081A5B0 /* OneSignalFramework */,
+				CD6681962FDC41480081A5B0 /* OneSignalInAppMessages */,
+				CD6681982FDC41480081A5B0 /* OneSignalLocation */,
+				CD8A2CA92FDC64C100FFC0DD /* FirebaseAuth */,
+				CD8A2CAB2FDC64C100FFC0DD /* FirebaseCore */,
+				CD8A2CAD2FDC64C100FFC0DD /* FirebaseFirestore */,
+				2089063B2FDEE5220011FB56 /* StripePaymentSheet */,
 			);
 			productName = "Mansion Nightclub";
 			productReference = CD3F35012FDC19D6003154F5 /* Mansion Nightclub.app */;
@@ -77,9 +196,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2620;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
+					208906292FDCB6E50011FB56 = {
+						CreatedOnToolsVersion = 26.5;
+					};
 					CD3F35002FDC19D6003154F5 = {
 						CreatedOnToolsVersion = 26.2;
 					};
@@ -94,17 +216,30 @@
 			);
 			mainGroup = CD3F34F82FDC19D6003154F5;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CD6681932FDC41480081A5B0 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */,
+				CD8A2CA82FDC64C100FFC0DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				2089063A2FDEE5220011FB56 /* XCRemoteSwiftPackageReference "stripe-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CD3F35022FDC19D6003154F5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				CD3F35002FDC19D6003154F5 /* Mansion Nightclub */,
+				208906292FDCB6E50011FB56 /* MansionNotificationService */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		208906282FDCB6E50011FB56 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CD3F34FF2FDC19D6003154F5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +250,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		208906262FDCB6E50011FB56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CD3F34FD2FDC19D6003154F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +266,73 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		208906302FDCB6E50011FB56 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 208906292FDCB6E50011FB56 /* MansionNotificationService */;
+			targetProxy = 2089062F2FDCB6E50011FB56 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		208906332FDCB6E50011FB56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4V275QTAVK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MansionNotificationService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MansionNotificationService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ShareStudio.Mansion-Nightclub.MansionNotificationService";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		208906342FDCB6E50011FB56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4V275QTAVK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MansionNotificationService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MansionNotificationService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ShareStudio.Mansion-Nightclub.MansionNotificationService";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		CD3F350A2FDC19D6003154F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -178,7 +386,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -236,7 +444,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -251,16 +459,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Mansion Nightclub/Mansion Nightclub.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4V275QTAVK;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Mansion Nightclub/Info.plist";
+				INFOPLIST_KEY_UIBackgroundModes = "remote-notification";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -283,16 +489,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Mansion Nightclub/Mansion Nightclub.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4V275QTAVK;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Mansion Nightclub/Info.plist";
+				INFOPLIST_KEY_UIBackgroundModes = "remote-notification";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -313,6 +517,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		208906322FDCB6E50011FB56 /* Build configuration list for PBXNativeTarget "MansionNotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				208906332FDCB6E50011FB56 /* Debug */,
+				208906342FDCB6E50011FB56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CD3F34FC2FDC19D6003154F5 /* Build configuration list for PBXProject "Mansion Nightclub" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -332,6 +545,71 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2089063A2FDEE5220011FB56 /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stripe/stripe-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 25.17.0;
+			};
+		};
+		CD6681932FDC41480081A5B0 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OneSignal/OneSignal-XCFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.3;
+			};
+		};
+		CD8A2CA82FDC64C100FFC0DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2089063B2FDEE5220011FB56 /* StripePaymentSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2089063A2FDEE5220011FB56 /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripePaymentSheet;
+		};
+		CD6681942FDC41480081A5B0 /* OneSignalFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD6681932FDC41480081A5B0 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalFramework;
+		};
+		CD6681962FDC41480081A5B0 /* OneSignalInAppMessages */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD6681932FDC41480081A5B0 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalInAppMessages;
+		};
+		CD6681982FDC41480081A5B0 /* OneSignalLocation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD6681932FDC41480081A5B0 /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalLocation;
+		};
+		CD8A2CA92FDC64C100FFC0DD /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD8A2CA82FDC64C100FFC0DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		CD8A2CAB2FDC64C100FFC0DD /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD8A2CA82FDC64C100FFC0DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		CD8A2CAD2FDC64C100FFC0DD /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD8A2CA82FDC64C100FFC0DD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CD3F34F92FDC19D6003154F5 /* Project object */;
 }

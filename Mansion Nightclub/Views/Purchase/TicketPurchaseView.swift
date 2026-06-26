@@ -1,5 +1,6 @@
 import SwiftUI
 import PassKit
+import StripePaymentSheet
 
 struct TicketPurchaseView: View {
     let event: AppEvent
@@ -178,7 +179,8 @@ struct TicketPurchaseView: View {
                 appState.purchaseTickets(event: event, tier: tier, quantity: quantity)
                 step = .confirmation
             },
-            onBack: { step = .summary }
+            onBack: { step = .summary },
+            onError: { msg in errorMessage = msg; step = .summary }
         )
     }
 
@@ -261,9 +263,7 @@ struct TicketPurchaseView: View {
     }
 }
 
-// MARK: - Stripe Payment Web View
-
-import WebKit
+// MARK: - Stripe Native Payment Sheet
 
 struct StripePaymentView: View {
     let clientSecret: String
@@ -273,134 +273,113 @@ struct StripePaymentView: View {
     let quantity: Int
     let onSuccess: () -> Void
     let onBack: () -> Void
+    let onError: (String) -> Void
 
-    @State private var cardNumber = ""
-    @State private var expiry = ""
-    @State private var cvc = ""
-    @State private var nameOnCard = ""
-    @State private var isProcessing = false
-    @State private var errorMessage: String?
+    @State private var paymentSheet: PaymentSheet?
+    @State private var isLoading = true
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Order recap
-                    HStack {
-                        Text("\(quantity)x \(tierName) — \(eventName)")
-                            .font(.bodyMedium)
-                            .foregroundColor(.textSecondary)
-                        Spacer()
-                        Text(total)
-                            .font(.titleMedium)
-                            .foregroundColor(.white)
-                    }
-                    .padding(16)
-                    .background(Color.surface)
-                    .cornerRadius(12)
+            Spacer()
 
-                    // Card form
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Card Details")
-                            .font(.titleMedium)
-                            .foregroundColor(.white)
-
-                        CardInputField(label: "Card number", placeholder: "1234 5678 9012 3456", text: $cardNumber)
-                            .keyboardType(.numberPad)
-                        HStack(spacing: 12) {
-                            CardInputField(label: "Expiry", placeholder: "MM/YY", text: $expiry)
-                                .keyboardType(.numberPad)
-                            CardInputField(label: "CVC", placeholder: "123", text: $cvc)
-                                .keyboardType(.numberPad)
-                        }
-                        CardInputField(label: "Name on card", placeholder: "Your name", text: $nameOnCard)
-                    }
-                    .padding(16)
-                    .background(Color.surface)
-                    .cornerRadius(14)
-
-                    if let error = errorMessage {
-                        Text(error)
-                            .font(.bodyMedium)
-                            .foregroundColor(.red)
-                            .padding(12)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.red.opacity(0.1))
-                            .cornerRadius(10)
-                    }
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "lock.fill")
-                        Text("Payments secured by Stripe")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.textSecondary)
+            VStack(spacing: 20) {
+                // Order recap
+                VStack(spacing: 8) {
+                    Text(eventName)
+                        .font(.titleMedium)
+                        .foregroundColor(.white)
+                    Text("\(quantity)x \(tierName)")
+                        .font(.bodyMedium)
+                        .foregroundColor(.textSecondary)
+                    Text(total)
+                        .font(.displayMedium)
+                        .foregroundColor(.brand)
                 }
                 .padding(20)
+                .frame(maxWidth: .infinity)
+                .background(Color.surface)
+                .cornerRadius(14)
+                .padding(.horizontal, 20)
+
+                if isLoading {
+                    ProgressView()
+                        .tint(Color.brand)
+                        .padding()
+                }
             }
 
+            Spacer()
+
             VStack(spacing: 12) {
-                Button(action: processPayment) {
-                    ZStack {
-                        if isProcessing {
-                            ProgressView().tint(.white)
-                        } else {
-                            Text("Pay \(total)")
-                                .font(.titleMedium)
-                                .foregroundColor(.white)
-                        }
+                if let sheet = paymentSheet {
+                    PaymentSheet.PaymentButton(
+                        paymentSheet: sheet,
+                        onCompletion: handleResult
+                    ) {
+                        Text("Pay \(total)")
+                            .font(.titleMedium)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 54)
+                            .background(Color.brand)
+                            .cornerRadius(14)
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 54)
-                    .background(Color.brand)
-                    .cornerRadius(14)
+                    .padding(.horizontal, 20)
                 }
-                .disabled(isProcessing || cardNumber.isEmpty || expiry.isEmpty || cvc.isEmpty)
 
                 Button(action: onBack) {
                     Text("Back")
                         .font(.bodyMedium)
                         .foregroundColor(.textSecondary)
                 }
+                .padding(.bottom, 8)
             }
-            .padding(20)
+            .padding(.bottom, 20)
         }
         .background(Color.appBackground)
+        .onAppear { preparePaymentSheet() }
     }
 
-    private func processPayment() {
-        isProcessing = true
-        errorMessage = nil
-        // Stripe SDK payment sheet will be integrated here once SPM package is added.
-        // For now simulate success after brief delay so UX flow is testable.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            isProcessing = false
+    private func preparePaymentSheet() {
+        STPAPIClient.shared.publishableKey = "pk_test_51TiDyxLKrlN8iiicyEwh9dlVYaXSV11VLtEPie2rkHRe8zvFODQN6YPTyzTBbxkSilC2i8ddEpCzPSDGwjw04yhp00IQM1gmlP"
+
+        var config = PaymentSheet.Configuration()
+        config.merchantDisplayName = "Mansion Nightclub"
+        config.appearance = stripeAppearance()
+        config.allowsDelayedPaymentMethods = false
+        config.applePay = .init(
+            merchantId: "merchant.com.mansionnightclub.liverpool",
+            merchantCountryCode: "GB"
+        )
+
+        paymentSheet = PaymentSheet(paymentIntentClientSecret: clientSecret, configuration: config)
+        isLoading = false
+    }
+
+    private func handleResult(_ result: PaymentSheetResult) {
+        switch result {
+        case .completed:
             onSuccess()
+        case .canceled:
+            break
+        case .failed(let error):
+            onError(error.localizedDescription)
         }
+    }
+
+    private func stripeAppearance() -> PaymentSheet.Appearance {
+        var appearance = PaymentSheet.Appearance()
+        appearance.colors.background = UIColor(red: 0.07, green: 0.07, blue: 0.07, alpha: 1)
+        appearance.colors.componentBackground = UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
+        appearance.colors.componentBorder = UIColor(red: 0.16, green: 0.16, blue: 0.16, alpha: 1)
+        appearance.colors.primary = UIColor(red: 0.788, green: 0.659, blue: 0.298, alpha: 1)
+        appearance.colors.text = .white
+        appearance.colors.textSecondary = UIColor(red: 0.53, green: 0.53, blue: 0.53, alpha: 1)
+        appearance.cornerRadius = 12
+        return appearance
     }
 }
 
-struct CardInputField: View {
-    let label: String
-    let placeholder: String
-    @Binding var text: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.label)
-                .foregroundColor(.textSecondary)
-            TextField(placeholder, text: $text)
-                .font(.bodyLarge)
-                .foregroundColor(.white)
-                .padding(.horizontal, 14)
-                .frame(height: 48)
-                .background(Color.surfaceElevated)
-                .cornerRadius(10)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.divider, lineWidth: 1))
-        }
-    }
-}
 
 #Preview {
     TicketPurchaseView(event: MockData.events[0], tier: MockData.events[0].tiers[1])

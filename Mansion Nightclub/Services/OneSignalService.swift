@@ -8,8 +8,8 @@ import OneSignalFramework
 struct OneSignalConfig {
     static let appId = "9698bd39-6e4d-40b0-8dfc-1432d7921143"
 
-    // REST API Key from: OneSignal Dashboard → Settings → Keys & IDs
-    static var restApiKey = "os_v2_app_s2ml2olojvalbdp4cqznpeqripsqjeshtrcuu3n5seueu3akj67cyff6ayyupmohbly5ge77byggij3ha4kaqhes3avh77qeyncbj5a"
+    // REST API Key — set via ONESIGNAL_REST_API_KEY env var or replace before building
+    static var restApiKey = Bundle.main.object(forInfoDictionaryKey: "ONESIGNAL_REST_API_KEY") as? String ?? ""
 
     static var isConfigured: Bool { !restApiKey.isEmpty }
 
@@ -161,8 +161,6 @@ extension OneSignalManager {
             "app_id": OneSignalConfig.appId,
             "headings": ["en": title],
             "contents": ["en": body],
-            "ios_attachments": ["logo": "https://web-production-d34cc.up.railway.app/notification-icon.png"],
-            "mutable_content": true,
         ]
 
         switch audience {
